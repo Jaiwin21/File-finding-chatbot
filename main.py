@@ -9,6 +9,8 @@ from tkinter import font as tkfont
 from tkinter import filedialog
 from tkinter import messagebox
 from tkinter import ttk
+import glob
+
 
 # Initialize NLTK and SpaCy variables
 nltk.download('stopwords')
@@ -36,8 +38,20 @@ def preprocess(text):
 def generate_response(message):
     # Preprocess the user's message
     tokens = preprocess(message)
-    
-    # Check if any specific keywords or phrases are present in the tokens
+
+# Function to search for files starting with the specified prefix in the C drive
+def find_files_starting_with(prefix):
+    matching_files = []
+    for root, dirs, files in os.walk('C:\\'):
+        for file in files:
+            if file.lower().startswith(prefix.lower()) and file.lower().endswith('.txt'):
+                matching_files.append(os.path.join(root, file))
+    return matching_files
+
+# Generate a response based on the user's input
+def generate_response(message):
+    tokens = message.lower().split()
+
     if 'documents' in tokens or 'files' in tokens:
         response = "Sure, I can help you with that. Please provide the necessary documents."
     elif 'chase' in tokens or 'follow up' in tokens:
@@ -62,10 +76,10 @@ def generate_response(message):
         response = "File retrieval canceled."
     elif message.lower().startswith('open '):
         file_name = message.replace('open ', '').strip()
-        matching_files = [file for file in retrieved_files if file.lower().startswith(file_name.lower())]
+        matching_files = [file for file in retrieved_files if os.path.basename(file).lower().startswith(file_name.lower())]
         if matching_files:
             if len(matching_files) == 1:
-                file_path = os.path.join(os.getcwd(), matching_files[0])
+                file_path = matching_files[0]
                 if os.path.isfile(file_path):
                     open_file(file_path)
                     response = "Opening the file."
@@ -78,7 +92,7 @@ def generate_response(message):
     elif message.isdigit() and retrieved_files:
         file_index = int(message)
         if file_index > 0 and file_index <= len(retrieved_files):
-            file_path = os.path.join(os.getcwd(), retrieved_files[file_index - 1])
+            file_path = retrieved_files[file_index - 1]
             if os.path.isfile(file_path):
                 open_file(file_path)
                 response = "Opening the file."
@@ -91,14 +105,7 @@ def generate_response(message):
 
     return response
 
-# Find files starting with the specified prefix
-def find_files_starting_with(prefix):
-    matching_files = []
-    current_dir = os.getcwd()
-    for file in os.listdir(current_dir):
-        if file.lower().startswith(prefix.lower()):
-            matching_files.append(file)
-    return matching_files
+
 
 # Open the file using the default associated program
 def open_file(file_path):

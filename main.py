@@ -128,6 +128,7 @@ def send_message():
 def send_message_on_enter(event):
     send_message()
 
+# Code for dark mode
 def toggle_dark_mode():
     if dark_mode.get():
         # Dark Mode
@@ -151,7 +152,7 @@ def toggle_dark_mode():
     # Update the button colors
     style.configure('SendButton.TButton', background=button_bg_color, foreground=button_fg_color)
 
-# Create the GUI
+# Code below this point is for the GUI and other appearance featrues
 window = tk.Tk()
 window.title("AI Chatbot")
 
